@@ -16,6 +16,7 @@ from .data_dictionaries import messages
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 SECRET_KEY_PATH = PROJECT_ROOT / "saved_data" / "secret.key"
+_KEY_CACHE = None  # Cache Fernet key for performance
 
 
 def _ensure_key_directory():
@@ -26,10 +27,12 @@ def _ensure_key_directory():
 def generate_key():
     """Generates Fernet encryption key and saves to secret.key."""
     _ensure_key_directory()
+    global _KEY_CACHE
     try:
         key = Fernet.generate_key()
         with open(SECRET_KEY_PATH, "wb") as key_file:  # 'wb': Prevents text artifacts in key files
             key_file.write(key)
+            _KEY_CACHE = key
         show_message(messages["success"]["key"])
     except FileNotFoundError as error:
         print(error)
@@ -42,10 +45,15 @@ def load_key():
     Returns:
         - Binary secret key data (bytes).
     """
+    global _KEY_CACHE
+    if _KEY_CACHE is not None:
+        return _KEY_CACHE
+
     while True:
         try:
             with open(SECRET_KEY_PATH, "rb") as key_file:  # 'rb': Fernet keys are binary (no text encoding)
-                return key_file.read()
+                _KEY_CACHE = key_file.read()
+                return _KEY_CACHE
         except FileNotFoundError:
             generate_key()
 
