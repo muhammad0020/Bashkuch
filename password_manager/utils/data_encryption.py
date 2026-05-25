@@ -24,7 +24,7 @@ def _ensure_key_directory():
     SECRET_KEY_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
-def generate_key():
+def _generate_key():
     """Generates Fernet encryption key and saves to secret.key."""
     _ensure_key_directory()
     global _KEY_CACHE
@@ -39,7 +39,7 @@ def generate_key():
         raise  # Re-raise the exception to let the caller handle it
 
 
-def load_key():
+def _load_key() -> bytes:
     """
     Loads Fernet key from secret.key file.
 
@@ -56,13 +56,13 @@ def load_key():
                 _KEY_CACHE = key_file.read()
                 return _KEY_CACHE
         except FileNotFoundError:
-            generate_key()
+            _generate_key()
         # Catch all OS-level errors (permissions, disk full) to re-raise with context
         except OSError:
             raise  # Re-raise the exception to let the caller handle it
 
 
-def encrypt_data(data):
+def encrypt_data(plain_text: str) -> str:
     """
     Encrypts password using loaded Fernet key.
 
@@ -73,12 +73,12 @@ def encrypt_data(data):
         - Encrypted user password (str).
     """
 
-    key = load_key()
-    f = Fernet(key)
-    return f.encrypt(data.encode()).decode()
+    key = _load_key()
+    fernet_key = Fernet(key)
+    return fernet_key.encrypt(plain_text.encode()).decode()
 
 
-def decrypt_data(encrypted_data):
+def decrypt_data(cipher_text: str) -> str:
     """
     Decrypts password using loaded Fernet key.
 
@@ -89,7 +89,7 @@ def decrypt_data(encrypted_data):
         - Decrypted password (str).
     """
 
-    key = load_key()
-    f = Fernet(key)
-    return f.decrypt(encrypted_data.encode()).decode()
+    key = _load_key()
+    fernet_key = Fernet(key)
+    return fernet_key.decrypt(cipher_text.encode()).decode()
 
