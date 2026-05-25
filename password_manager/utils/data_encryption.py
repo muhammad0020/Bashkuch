@@ -34,8 +34,9 @@ def generate_key():
             key_file.write(key)
             _KEY_CACHE = key
         show_message(messages["success"]["key"])
-    except FileNotFoundError as error:
-        print(error)
+    # Catch all OS-level errors (permissions, disk full) to re-raise with context
+    except OSError:
+        raise  # Re-raise the exception to let the caller handle it
 
 
 def load_key():
@@ -56,6 +57,9 @@ def load_key():
                 return _KEY_CACHE
         except FileNotFoundError:
             generate_key()
+        # Catch all OS-level errors (permissions, disk full) to re-raise with context
+        except OSError:
+            raise  # Re-raise the exception to let the caller handle it
 
 
 def encrypt_data(data):
