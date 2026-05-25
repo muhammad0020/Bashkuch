@@ -18,9 +18,14 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 SECRET_KEY_PATH = PROJECT_ROOT / "saved_data" / "secret.key"
 
 
+def _ensure_key_directory():
+    """Create saved_data directory if missing."""
+    SECRET_KEY_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+
 def generate_key():
     """Generates Fernet encryption key and saves to secret.key."""
-
+    _ensure_key_directory()
     try:
         key = Fernet.generate_key()
         with open(SECRET_KEY_PATH, "wb") as key_file:  # 'wb': Prevents text artifacts in key files
@@ -37,15 +42,12 @@ def load_key():
     Returns:
         - Binary secret key data (bytes).
     """
-
-    if not SECRET_KEY_PATH.exists():  # prevent FileNotFoundError
-        generate_key()
-
-    try:
-        with open(SECRET_KEY_PATH, "rb") as key_file:  # 'rb': Fernet keys are binary (no text encoding)
-            return key_file.read()
-    except Exception as e:  # for unexpected errors
-        print(e)
+    while True:
+        try:
+            with open(SECRET_KEY_PATH, "rb") as key_file:  # 'rb': Fernet keys are binary (no text encoding)
+                return key_file.read()
+        except FileNotFoundError:
+            generate_key()
 
 
 def encrypt_data(data):
