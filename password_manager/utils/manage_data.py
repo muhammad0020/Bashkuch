@@ -1,9 +1,9 @@
 """Secure text data handling: save to disk, load from disk, and copy to clipboard."""
 
 from json import load, dump
-from subprocess import run, CalledProcessError
-from sys import platform
 from pathlib import Path
+
+from pyperclip import copy, PyperclipException
 
 from .show_and_get_data import show_message
 from .data_dictionaries import messages
@@ -92,20 +92,11 @@ def copy_to_clipboard(text):
     Parameters:
         - text (str): Text to copy to clipboard.
     """
-
     try:
-        if platform == "win32":
-                run(
-                    ["powershell", "-command", f"Set-Clipboard -Value '{text}'"],
-                    shell=True, capture_output=True)
-
-        elif platform == "darwin":
-            run(["pbcopy"], input=text.encode())
-
-        elif platform.startswith("linux"):
-            run(["xclip", "-selection", "clipboard"], input=text.encode(), check=True)
-
+        copy(text)
         show_message(messages["success"]["copied"])
-
-    except CalledProcessError:
+    # Display specific error message: missing tool or clipboard access problem.
+    except PyperclipException:  
+        show_message(messages["error"]["not_copied"])
+    except Exception:  # for unexpected errors
         show_message(messages["error"]["not_copied"])
