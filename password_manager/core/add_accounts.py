@@ -12,7 +12,7 @@ from ..utils import show_message
 from ..utils import save_data
 
 
-def add_password(accounts_list, recycle_bin_data, unique_keys):
+def create_accounts(accounts: list, deleted_accounts: list, unique_keys: set):
     """
     Prompts user for service name, username, and password.
     Encrypts and saves to vault. Prevents duplicates by checking username uniqueness.
@@ -67,13 +67,13 @@ def add_password(accounts_list, recycle_bin_data, unique_keys):
             continue
         break
 
-    accounts_list.append(
+    accounts.append(
         {"service_name": service_name,
          "username":  username,
          "password": password
          })
 
-    save_data(accounts_list, recycle_bin_data)
+    save_data(accounts, deleted_accounts)
     unique_keys.add(key)
     clear_terminal()
     show_message(messages["success"]["saved"])

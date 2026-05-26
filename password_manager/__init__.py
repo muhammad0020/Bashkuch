@@ -1,6 +1,6 @@
 """Functions execute in main.py"""
 
-from .core.add_accounts import add_password
+from .core.add_accounts import create_accounts
 from .core.manage_accounts import manage_passwords
 from .core.generate_password import password_generator
 from .core.delete_accounts import recycle_bin
