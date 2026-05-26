@@ -63,10 +63,14 @@ def save_data(vault, deleted_accounts):
         "vault": _encrypt_accounts(vault),
         "deleted_accounts": _encrypt_accounts(deleted_accounts)
     }
-
-    with open(DATA_JSON_PATH, "w") as f:
-        dump(data, f, indent=4)  # indent=4 for pretty formatting
-
+    # Ensure the directory exists when generating or loading the Fernet key,
+    # so no further directory checks are needed.
+    try:
+        with open(DATA_JSON_PATH, "w") as f:
+            dump(data, f, indent=4)  # indent=4 for pretty formatting
+    # Catch all OS-level errors (permissions, disk full) to re-raise with context
+    except OSError:
+        raise  # Re-raise the exception to let the caller handle it
 
 def load_data():
     """
@@ -80,9 +84,14 @@ def load_data():
     try:
         with open(DATA_JSON_PATH, "r") as f:
             data = load(f)
-        return _decrypt_accounts(data["vault"]), _decrypt_accounts(data["deleted_accounts"])
+        vault_data = data.get("vault", [])
+        deleted_data = data.get("deleted_accounts", [])
+        return _decrypt_accounts(vault_data), _decrypt_accounts(deleted_data)
     except FileNotFoundError:
         return [], []
+    # Catch all OS-level errors (permissions, disk full) to re-raise with context
+    except OSError:
+        raise  # Re-raise the exception to let the caller handle it
 
 
 def copy_to_clipboard(text):
