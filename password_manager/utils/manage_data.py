@@ -1,14 +1,13 @@
 """Secure text data handling: save to disk, load from disk, and copy to clipboard."""
 
-from json import load, dump, JSONDecodeError
+import json
 from pathlib import Path
 
-from pyperclip import copy, PyperclipException
+import pyperclip
 
 from .show_and_get_data import show_message
 from .data_dictionaries import messages
 from .data_encryption import encrypt_data, decrypt_data
-
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_JSON_PATH = PROJECT_ROOT / "saved_data" / "data.json"
@@ -67,10 +66,11 @@ def save_data(vault: list, deleted_accounts: list):
     # so no further directory checks are needed.
     try:
         with open(DATA_JSON_PATH, "w") as f:
-            dump(data, f, indent=4)  # indent=4 for pretty formatting
+            json.dump(data, f, indent=4)  # indent=4 for pretty formatting
     # Catch all OS-level errors (permissions, disk full) to re-raise with context
     except OSError:
         raise  # Re-raise the exception to let the caller handle it
+
 
 def load_data() -> tuple[list, list]:
     """
@@ -83,11 +83,11 @@ def load_data() -> tuple[list, list]:
     """
     try:
         with open(DATA_JSON_PATH, "r") as f:
-            data = load(f)
+            data = json.load(f)
         vault_data = data.get("vault", [])
         deleted_data = data.get("deleted_accounts", [])
         return _decrypt_accounts(vault_data), _decrypt_accounts(deleted_data)
-    except (FileNotFoundError, JSONDecodeError):
+    except (FileNotFoundError, json.JSONDecodeError):
         return [], []
     # Catch all OS-level errors (permissions, disk full) to re-raise with context
     except OSError:
@@ -102,10 +102,8 @@ def copy_to_clipboard(text: str):
         - text: Text to copy to clipboard.
     """
     try:
-        copy(text)
+        pyperclip.copy(text)
         show_message(messages["success"]["copied"])
     # Display specific error message: missing tool or clipboard access problem.
-    except PyperclipException:
-        show_message(messages["error"]["not_copied"])
-    except Exception:  # for unexpected errors
+    except pyperclip.PyperclipException:
         show_message(messages["error"]["not_copied"])
