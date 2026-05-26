@@ -1,6 +1,6 @@
 """Secure text data handling: save to disk, load from disk, and copy to clipboard."""
 
-from json import load, dump
+from json import load, dump, JSONDecodeError
 from pathlib import Path
 
 from pyperclip import copy, PyperclipException
@@ -87,7 +87,7 @@ def load_data() -> tuple[list, list]:
         vault_data = data.get("vault", [])
         deleted_data = data.get("deleted_accounts", [])
         return _decrypt_accounts(vault_data), _decrypt_accounts(deleted_data)
-    except FileNotFoundError:
+    except (FileNotFoundError, JSONDecodeError):
         return [], []
     # Catch all OS-level errors (permissions, disk full) to re-raise with context
     except OSError:
