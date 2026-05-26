@@ -23,12 +23,6 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
         - unique_keys (set): Set of unique service names and usernames to prevent save duplicated accounts.
     """
 
-    def main():
-        """Main entry point."""
-
-        show_header(menu_titles["manage"])
-        return show_and_get(menu_options["manage"]["main"], messages["prompt"]["choice"])
-
     def search_passwords():
         """
         Searches vault by service name and displays matching accounts.
@@ -148,13 +142,14 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
         show_message(messages["error"]["no_password"])
         return
 
+    show_header(menu_titles["manage"])
     search_data = []
     menu_stack = []
     item_index = []
 
     while True:
         if not menu_stack:
-            choice = main()
+            choice = show_and_get(menu_options["manage"]["main"], messages["prompt"]["choice"])
 
             if choice == 1:
                 menu_stack.append("search")

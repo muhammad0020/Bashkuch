@@ -21,15 +21,6 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
         - recycle_bin_data (list, dict): List of deleted accounts in deleted_accounts list.
         - unique_keys (set): Set of unique service names and usernames to prevent save duplicated accounts.
     """
-
-
-    def main():
-        """Main entry point."""
-
-        show_header(menu_titles["recycle"])
-        return show_and_get(menu_options["recycle"]["main"], messages["prompt"]["choice"])
-
-
     def show_deleted_accounts():
         """
         Shows deleted accounts in deleted_accounts list.
@@ -148,12 +139,13 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
         show_message(messages["error"]["bin_empty"])
         return
 
+    show_header(menu_titles["recycle"])
     menu_stack = []
     item_index = []
 
     while True:
         if not menu_stack:
-            choice = main()
+            choice = show_and_get(menu_options["recycle"]["main"], messages["prompt"]["choice"])
             if choice == 1:
                 menu_stack.append("show_accounts")
 
