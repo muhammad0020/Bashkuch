@@ -14,6 +14,23 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_JSON_PATH = PROJECT_ROOT / "saved_data" / "data.json"
 
 
+def _encrypt_accounts(accounts: list) -> list:
+    """
+    Encrypt all sensitive fields in a list of account dicts.
+
+    Parameters:
+        - accounts: List of dicts with keys 'service_name', 'username', 'password'.
+
+    Returns:
+        - List of dicts with same keys, each value encrypted by encrypt_data().
+    """
+    return [{
+        "service_name": encrypt_data(acc["service_name"]),
+        "username": encrypt_data(acc["username"]),
+        "password": encrypt_data(acc["password"])
+    } for acc in accounts]
+
+
 def save_data(vault, deleted_accounts):
     """
     Save created accounts data to vault and deleted services data to deleted_accounts.
@@ -22,27 +39,9 @@ def save_data(vault, deleted_accounts):
         - vault (list): user saved accounts.
         - deleted_accounts (list): accounts that have been deleted by user.
     """
-
-    encrypted_vault = []
-    encrypted_deleted_accounts = []
-
-    for account in vault:
-        encrypted_vault.append({
-            "service_name": encrypt_data(account["service_name"]),
-            "username": encrypt_data(account["username"]),
-            "password": encrypt_data(account["password"])
-        })
-
-    for account in deleted_accounts:
-        encrypted_deleted_accounts.append({
-            "service_name": encrypt_data(account["service_name"]),
-            "username": encrypt_data(account["username"]),
-            "password": encrypt_data(account["password"])
-        })
-
     data = {
-        "vault": encrypted_vault,
-        "deleted_accounts": encrypted_deleted_accounts
+        "vault": _encrypt_accounts(vault),
+        "deleted_accounts": _encrypt_accounts(deleted_accounts)
     }
 
     with open(DATA_JSON_PATH, "w") as f:
