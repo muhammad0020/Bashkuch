@@ -31,6 +31,26 @@ def _encrypt_accounts(accounts: list) -> list:
     } for acc in accounts]
 
 
+def _decrypt_accounts(accounts: list) -> list:
+    """
+    Decrypt a list of encrypted account dictionaries.
+
+    This helper reverses the encryption applied by _encrypt_accounts(),
+    converting stored encrypted strings back to plain text for runtime use.
+
+    Parameters:
+        accounts: List of dicts with encrypted values for keys 'service_name', 'username', 'password'.
+
+    Returns:
+        List of dicts with the same structure, each value decrypted via decrypt_data().
+    """
+    return [{
+        "service_name": decrypt_data(acc["service_name"]),
+        "username": decrypt_data(acc["username"]),
+        "password": decrypt_data(acc["password"])
+    } for acc in accounts]
+
+
 def save_data(vault, deleted_accounts):
     """
     Save created accounts data to vault and deleted services data to deleted_accounts.
@@ -57,29 +77,10 @@ def load_data():
         - decrypted_deleted_accounts (list): Decrypted deleted accounts.
         - Two empty lists if saved file not found (list).
     """
-
-    decrypted_vault = []
-    decrypted_deleted_accounts = []
-
     try:
         with open(DATA_JSON_PATH, "r") as f:
             data = load(f)
-
-        for account in data["vault"]:
-            decrypted_vault.append({
-                "service_name": decrypt_data(account["service_name"]),
-                "username": decrypt_data(account["username"]),
-                "password": decrypt_data(account["password"])
-            })
-
-        for account in data["deleted_accounts"]:
-            decrypted_deleted_accounts.append({
-                "service_name": decrypt_data(account["service_name"]),
-                "username": decrypt_data(account["username"]),
-                "password": decrypt_data(account["password"])
-            })
-
-        return decrypted_vault, decrypted_deleted_accounts
+        return _decrypt_accounts(data["vault"]), _decrypt_accounts(data["deleted_accounts"])
     except FileNotFoundError:
         return [], []
 
