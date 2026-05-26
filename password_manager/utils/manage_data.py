@@ -39,10 +39,10 @@ def _decrypt_accounts(accounts: list) -> list:
     converting stored encrypted strings back to plain text for runtime use.
 
     Parameters:
-        accounts: List of dicts with encrypted values for keys 'service_name', 'username', 'password'.
+        - accounts: List of dicts with encrypted values for keys 'service_name', 'username', 'password'.
 
     Returns:
-        List of dicts with the same structure, each value decrypted via decrypt_data().
+        - List of dicts with the same structure, each value decrypted via decrypt_data().
     """
     return [{
         "service_name": decrypt_data(acc["service_name"]),
@@ -51,13 +51,13 @@ def _decrypt_accounts(accounts: list) -> list:
     } for acc in accounts]
 
 
-def save_data(vault, deleted_accounts):
+def save_data(vault: list, deleted_accounts: list):
     """
     Save created accounts data to vault and deleted services data to deleted_accounts.
 
     Parameters:
-        - vault (list): user saved accounts.
-        - deleted_accounts (list): accounts that have been deleted by user.
+        - vault: user saved accounts.
+        - deleted_accounts: accounts that have been deleted by user.
     """
     data = {
         "vault": _encrypt_accounts(vault),
@@ -72,14 +72,14 @@ def save_data(vault, deleted_accounts):
     except OSError:
         raise  # Re-raise the exception to let the caller handle it
 
-def load_data():
+def load_data() -> tuple[list, list]:
     """
     loads saved data from data.json file and decrypt it.
 
     Returns:
-        - decrypted_vault (list): Decrypted saved accounts.
-        - decrypted_deleted_accounts (list): Decrypted deleted accounts.
-        - Two empty lists if saved file not found (list).
+        - Decrypted saved accounts in data['vault'].
+        - Decrypted deleted accounts in data['deleted_accounts'].
+        - Empty lists if saved file not found or keys are missing.
     """
     try:
         with open(DATA_JSON_PATH, "r") as f:
@@ -94,18 +94,18 @@ def load_data():
         raise  # Re-raise the exception to let the caller handle it
 
 
-def copy_to_clipboard(text):
+def copy_to_clipboard(text: str):
     """
-    Copies text to system clipboard using OS-specific methods.
+    Copies text to system clipboard using pyperclip module.
 
     Parameters:
-        - text (str): Text to copy to clipboard.
+        - text: Text to copy to clipboard.
     """
     try:
         copy(text)
         show_message(messages["success"]["copied"])
     # Display specific error message: missing tool or clipboard access problem.
-    except PyperclipException:  
+    except PyperclipException:
         show_message(messages["error"]["not_copied"])
     except Exception:  # for unexpected errors
         show_message(messages["error"]["not_copied"])
