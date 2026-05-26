@@ -23,27 +23,17 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
         - unique_keys (set): Set of unique service names and usernames to prevent save duplicated accounts.
     """
 
-    def search_passwords():
+    def search_accounts() -> list:
         """
         Searches vault by service name and displays matching accounts.
 
         Returns:
-            - Not_found (int): If search results not present in accounts_list.
-            - search_results (list): Ephemeral search results as list of dictionaries for display context.
+            - List of matching account dictionaries. Empty list if no matches found.
         """
-
         print("=" * 46)
         service_name = input(messages["prompt"]["service_name"]).strip().lower()
-        for service in accounts_list:
-            if service["service_name"] == service_name:
-                search_data.append(service)
+        return [s for s in accounts_list if s["service_name"] == service_name]
 
-        if not search_data:  # if specific service not found
-            show_message(messages["error"]["not_found"])
-            return "Not_found"
-
-        else:
-            return "Found"
 
     def show_saved_accounts():
         """
@@ -148,15 +138,16 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
             current_menu = menu_stack[-1]
 
             if current_menu == "search":
-                result = search_passwords()
+                result = search_accounts()
 
-                if result == "Not_found":
+                if not result:
+                    show_message(messages["error"]["not_found"])
                     menu_stack.pop()
 
                 else:
-                    menu_stack.append("show_accounts")
+                    menu_stack.append("search_result")
 
-            elif current_menu == "show_accounts":
+            elif current_menu == "show_accounts" or "search_result":
                 item_index.clear()  # delete previous item indexes to prevent infinite re-entry
                 choice = show_saved_accounts()
 
