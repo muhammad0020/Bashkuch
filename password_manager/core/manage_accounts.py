@@ -10,7 +10,7 @@ from ..common import  show_header, show_and_get
 from ..common import  menu_titles, menu_options, messages
 
 from ..utils import save_data
-from ..utils import show_message, show_accounts, get_service_names
+from ..utils import show_message, account_details, get_service_names
 
 
 def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
@@ -78,22 +78,6 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
                 # choose from search results. need convert to exact index in original list
                 return accounts_list.index(data_list[index])
 
-    def show_details():
-        """
-        Display detailed information of a selected account.
-
-        Retrieves the account details using the index from item_index stack,
-        displays the information, and presents action options to the user.
-
-        Returns:
-        - User's menu choice (edit/delete/exit) (int).
-        """
-
-        list_index = item_index[-1]
-        show_accounts(accounts_list[list_index])
-
-        # ask user what their want to do with selected service
-        return show_and_get(menu_options["manage"]["saved_accounts"], messages["prompt"]["choice"])
 
     def delete_accounts():
         """
@@ -191,7 +175,7 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
                     item_index.append(choice)
 
             elif current_menu == "show_details":
-                choice = show_details()
+                choice = account_details(accounts_list[item_index[-1]], menu_options["manage"]["saved_accounts"])
 
                 if choice == 1:
                     menu_stack.append("edit")

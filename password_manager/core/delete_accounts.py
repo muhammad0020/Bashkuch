@@ -8,7 +8,7 @@ Saves data after each operation.
 
 from ..common import show_header, show_and_get
 from ..common import menu_titles, menu_options, messages
-from ..utils import get_service_names, show_message, show_accounts
+from ..utils import get_service_names, show_message, account_details
 from ..utils import save_data
 
 
@@ -39,19 +39,6 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
 
         else:
             return index
-
-
-    def account_details():
-        """
-        Show selected account details and ask user what their wants to do with it.
-
-        Returns:
-            - User decisions for selected accounts including edit/delete operations (int).
-        """
-
-        index = item_index[-1]
-        show_accounts(recycle_bin_data[index])
-        return show_and_get(menu_options["recycle"]["second"], messages["prompt"]["choice"])
 
 
     def restore():
@@ -169,7 +156,7 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
                     item_index.append(choice)
 
             elif current_menu == "show_details":
-                choice = account_details()
+                choice = account_details(recycle_bin_data[item_index[-1]], menu_options["recycle"]["second"])
                 if choice == 1:
                     menu_stack.append("restore")
 

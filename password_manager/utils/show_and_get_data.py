@@ -121,22 +121,21 @@ def show_and_get(menu_options, prompt, convert_to_index=False):
     return get_and_validate()
 
 
-def show_accounts(account):
+def account_details(account: dict, menu_options: dict) -> int:
     """
-    Show information about specific account.
+    Show selected account details and ask user what their wants to do with it.
 
-    Parameters:
-        - account (dict): Account information (service name, username and password).
+    Returns:
+        - User decisions for selected accounts including edit/delete operations.
     """
-
-    # for displaying data encrypted by Fernet we need to decrypt it
     print("=" * 46)
     print(cleandoc(f"""
-    Service name: {account["service_name"]}  
-    Username: {account["username"]}   
-    Password: {account["password"]}
-    """))
+        Service name: {account["service_name"]}  
+        Username: {account["username"]}   
+        Password: {account["password"]}
+        """))
     print("=" * 46)
+    return show_and_get(menu_options, messages["prompt"]["choice"])
 
 
 def get_service_names(accounts_list, sort_key=None):
