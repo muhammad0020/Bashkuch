@@ -26,6 +26,7 @@ def add_password(accounts_list, recycle_bin_data, unique_keys):
     show_header(menu_titles["add"])
     # Re-prompt user to re-enter service details when duplicate service names or usernames
     # are detected during service registration
+    chars_limit = 30
     while True:
         # Re-prompt user for valid input when empty string is provided during input validation
         while True:
@@ -33,6 +34,9 @@ def add_password(accounts_list, recycle_bin_data, unique_keys):
             if not service_name:
                 show_message(messages["error"]["empty_service_field"])
                 continue  # Empty input detected
+            if len(service_name) > chars_limit:
+                show_message(messages["error"]["too_long_service_name"])
+                continue
             break
 
         # Re-prompt user for valid input when empty string is provided during input validation
@@ -41,6 +45,9 @@ def add_password(accounts_list, recycle_bin_data, unique_keys):
             if not username:
                 show_message(messages["error"]["empty_username_field"])
                 continue  # Empty input detected
+            if len(username) > chars_limit:
+                show_message(messages["error"]["too_long_username"])
+                continue
             break
 
         key = (service_name, username)
@@ -55,6 +62,9 @@ def add_password(accounts_list, recycle_bin_data, unique_keys):
         if not password:
             show_message(messages["error"]["empty_password_field"])
             continue  # Empty input detected
+        if len(password) > chars_limit:
+            show_message(messages["error"]["too_long_password"])
+            continue
         break
 
     accounts_list.append(
