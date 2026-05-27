@@ -10,7 +10,7 @@ from ..common import  show_header, show_and_get
 from ..common import  menu_titles, menu_options, messages
 
 from ..utils import save_data
-from ..utils import show_message, account_details, get_service_names
+from ..utils import show_message, account_details, select_account
 
 
 def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
@@ -33,40 +33,6 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
         print("=" * 46)
         service_name = input(messages["prompt"]["service_name"]).strip().lower()
         return [s for s in accounts_list if s["service_name"] == service_name]
-
-
-    def show_saved_accounts():
-        """
-        Display saved accounts and get user selection.
-
-        Shows accounts either from the original accounts_list or from previous
-        search results. Allows user to select an account or return to the
-        previous menu.
-
-    Returns:
-        - Back to previous menu (str): if user chooses to return.
-        - index (int): Index of selected account in the original accounts_list.
-        """
-
-        if not search_data:
-            data_list = accounts_list  # original accounts_list
-
-        else:
-            data_list = search_data  # search result
-
-        service_names = get_service_names(data_list)  # for show as menu_options
-        index = show_and_get(service_names, messages["prompt"]["choose_service"], convert_to_index=True)
-
-        if service_names[index] == "Back to previous menu":
-            return "Back to previous menu"
-
-        else:
-            if data_list == accounts_list:
-                return index  # choose from original list. no index conversion needed
-
-            else:
-                # choose from search results. need convert to exact index in original list
-                return accounts_list.index(data_list[index])
 
 
     def delete_accounts():
@@ -129,7 +95,7 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
                 menu_stack.append("search")
 
             elif choice == 2:
-                menu_stack.append("show_accounts")
+                menu_stack.append("select_accounts")
 
             else:
                 break
@@ -145,12 +111,17 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
                     menu_stack.pop()
 
                 else:
-                    menu_stack.append("search_result")
+                    choice = select_account(result)
+                    if choice == "Back to previous menu":
+                        menu_stack.pop()
+                    else:
+                        # choose from search results. need convert to exact index in original list
+                        item_index.append(accounts_list.index(result[choice]))
+                        menu_stack.append("show_details")
 
-            elif current_menu == "show_accounts" or "search_result":
+            elif current_menu == "select_accounts":
                 item_index.clear()  # delete previous item indexes to prevent infinite re-entry
-                choice = show_saved_accounts()
-
+                choice = select_account(accounts_list)
                 if choice == "Back to previous menu":
                     # Prevent infinite loop by skipping to parent menu when previous menu was 'search_password'
                     if len(menu_stack) >= 2 and menu_stack[-2] == "search":

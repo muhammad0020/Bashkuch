@@ -8,7 +8,7 @@ Saves data after each operation.
 
 from ..common import show_header, show_and_get
 from ..common import menu_titles, menu_options, messages
-from ..utils import get_service_names, show_message, account_details
+from ..utils import select_account, show_message, account_details
 from ..utils import save_data
 
 
@@ -21,25 +21,6 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
         - recycle_bin_data (list, dict): List of deleted accounts in deleted_accounts list.
         - unique_keys (set): Set of unique service names and usernames to prevent save duplicated accounts.
     """
-    def show_deleted_accounts():
-        """
-        Shows deleted accounts in deleted_accounts list.
-        Asks user to select a service from list.
-
-        Returns:
-            - Back to previous menu (str): If user select 'Back to previous menu' option.
-            - index (int): Index of account in deleted_accounts list to perform operations.
-        """
-
-        service_names = get_service_names(recycle_bin_data) # for show as menu_options
-        index = show_and_get(service_names, messages["prompt"]["choose_service"], convert_to_index=True)
-
-        if service_names[index] == "Back to previous menu":
-            return "Back to previous menu"
-
-        else:
-            return index
-
 
     def restore():
         """
@@ -147,7 +128,7 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
 
             if current_menu == "show_accounts":
                 item_index.clear()  # delete previous item indexes to prevent infinite re-entry
-                choice = show_deleted_accounts()
+                choice = select_account(recycle_bin_data)
                 if choice == "Back to previous menu":
                     menu_stack.pop()
 

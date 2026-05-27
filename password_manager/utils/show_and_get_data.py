@@ -121,6 +121,28 @@ def show_and_get(menu_options, prompt, convert_to_index=False):
     return get_and_validate()
 
 
+def select_account(accounts: list) -> str | int:
+    """
+    Display a list of accounts and prompt user to select one.
+
+    Shows all accounts from the provided list (e.g., vault, deleted accounts,
+    or search results). The user can choose an account by entering its number
+    or return to the previous menu without selecting.
+
+    Parameters:
+        - accounts: List of account dictionaries to display.
+
+    Returns:
+        - Back to previous menu: if user chooses to return.
+        - index: Index of selected account in the original given list.
+    """
+    service_names = get_service_names(accounts)  # for show as menu_options
+    index = show_and_get(service_names, messages["prompt"]["choose_service"], convert_to_index=True)
+    if service_names[index] == "Back to previous menu":
+        return "Back to previous menu"
+    return index
+
+
 def account_details(account: dict, menu_options: dict) -> int:
     """
     Show selected account details and ask user what their wants to do with it.
