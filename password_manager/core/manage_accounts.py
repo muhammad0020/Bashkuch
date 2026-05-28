@@ -9,7 +9,7 @@ from .edit_accounts import edit_account
 from ..common import  show_header, show_and_get
 from ..common import  menu_titles, menu_options, messages
 
-from ..utils import save_data
+from ..utils import delete_accounts
 from ..utils import show_message, account_details, select_account
 
 
@@ -34,49 +34,6 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
         service_name = input(messages["prompt"]["service_name"]).strip().lower()
         return [s for s in accounts_list if s["service_name"] == service_name]
 
-
-    def delete_accounts():
-        """
-        Deletes selected account from vault (moves to deleted_accounts list).
-
-        Returns:
-            - Empty (str): If delete operation is successful and accounts_list is empty.
-            - Success (str):
-                * If delete operation is successful and accounts_list is not empty.
-                * If user comes from search menu, delete operation is successful and search_data is not empty.
-            - Search_results_deleted (str): If user comes from search section and deletes all services with same name.
-            - Cancel (str): Users can backtrack to previous menus by selecting Cancel option.
-        """
-
-        index = item_index
-        # ask user to confirm their decision
-        confirmation = show_and_get(menu_options["manage"]["delete"], messages["prompt"]["delete_confirmation"])
-
-        if confirmation == 1:  # confirm delete account
-            # update unique_keys set
-            unique_keys.discard((accounts_list[index]["service_name"], accounts_list[index]["username"]))
-            recycle_bin_data.append(accounts_list.pop(index))  # add item to recycle bin
-            save_data(accounts_list, recycle_bin_data)
-            show_message(messages["success"]["deleted"])
-
-            if not accounts_list:
-                show_message(messages["error"]["no_password"])
-                return "Empty"
-
-            if search_results:  # if user comes from 'search services' menu
-                # remove deleted account from search_data so doesn't show in search results and raise error
-                search_results.remove(recycle_bin_data[-1])  # recent deleted account is last item in recycle_bin_data
-                if not search_results:  # if after remove item list hasn't any item, means all search results deleted
-                    return "Search_results_deleted"
-
-                else:  # if items still exist in search_data, return Success cause return to show_saved_accounts()
-                    return "Success"
-
-            else:
-                return "Success"
-
-        else:
-            return "Cancel"
 
     if not accounts_list:
         show_message(messages["error"]["no_password"])
@@ -154,17 +111,26 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
                 menu_stack.pop()
 
             elif current_menu == "delete":
-                choice = delete_accounts()
-                if choice == "Empty":
-                    break  # there is nothing to show. exit to main file
+                if search_results:  # if user comes from 'search services' menu search_result isn't 'None'
+                    choice = delete_accounts(accounts_list, recycle_bin_data, item_index, unique_keys)
+                    # After removing an account from accounts list, it should no longer appear in search results.
+                    # Any attempt to access it should raise an error.
+                    search_results.remove(recycle_bin_data[-1])  # recent deleted account is last item in recycle_bin_data
+                    if choice == "Empty":
+                        break  # All saved accounts have been deleted; return to main_menu.py.
 
-                elif choice == "Success":
+                    # No search results left; return to the main menu of manage_accounts.py.
+                    elif not search_results:
+                        del menu_stack[-2:]
+
+                else:
+                    choice = delete_accounts(accounts_list, recycle_bin_data, item_index, unique_keys)
+                    if choice == "Empty":
+                        break  # There is nothing to show. exit to main_menu.py
+
+                if choice == "Success":
                     # removing data removes account from accounts_list. so back to show_saved_accounts()
                     del menu_stack[-2:]
-
-                elif choice == "Search_results_deleted":
-                    # all searched accounts have been deleted, there is no service in search_data to show
-                    del menu_stack[-4:]  # back to manage_passwords main menu
 
                 elif choice == "Cancel":
                     menu_stack.pop()

@@ -9,7 +9,7 @@ Saves data after each operation.
 from ..common import show_header, show_and_get
 from ..common import menu_titles, menu_options, messages
 from ..utils import select_account, show_message, account_details
-from ..utils import save_data
+from ..utils import delete_accounts, save_data
 
 
 def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
@@ -52,33 +52,6 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
         else:
             show_message(messages["error"]["exist"])
             return "Back to previous menu"
-
-
-    def delete():
-        """
-        Delete selected account from deleted_accounts list.
-
-        Returns:
-            - Empty (str): If delete operation is successful and recycle bin is empty.
-            - Success (str): If delete operation is successful and recycle bin is not empty.
-            - Cancel (str): Users can backtrack to previous menus by selecting Cancel option.
-        """
-
-        list_index = item_index[-1]  # obtain service index that saved to list earlier
-        decision = show_and_get(menu_options["recycle"]["delete"], messages["prompt"]["delete_last_confirmation"])
-        if decision == 1:
-            recycle_bin_data.pop(list_index)
-            show_message(messages["success"]["deleted"])
-
-            if not recycle_bin_data:
-                show_message(messages["error"]["bin_empty"])
-                return "Empty"
-
-            else:
-                return "Success"
-
-        else:
-            return "Cancel"
 
 
     def remove_all():
@@ -162,7 +135,7 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
                     menu_stack.pop()
 
             elif current_menu == "delete":
-                choice = delete()
+                choice = delete_accounts(accounts_list, recycle_bin_data, item_index[-1])
                 if choice == "Success":
                     # removing data removes account from deleted_accounts list. so back to show_deleted_accounts()
                     del menu_stack[-2:]
