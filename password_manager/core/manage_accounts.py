@@ -48,7 +48,7 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
             - Cancel (str): Users can backtrack to previous menus by selecting Cancel option.
         """
 
-        index = item_index[-1]
+        index = item_index
         # ask user to confirm their decision
         confirmation = show_and_get(menu_options["manage"]["delete"], messages["prompt"]["delete_confirmation"])
 
@@ -63,10 +63,10 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
                 show_message(messages["error"]["no_password"])
                 return "Empty"
 
-            if search_data:  # if user comes from 'search services' menu
+            if search_results:  # if user comes from 'search services' menu
                 # remove deleted account from search_data so doesn't show in search results and raise error
-                search_data.remove(recycle_bin_data[-1])  # recent deleted account is last item in recycle_bin_data
-                if not search_data:  # if after remove item list hasn't any item, means all search results deleted
+                search_results.remove(recycle_bin_data[-1])  # recent deleted account is last item in recycle_bin_data
+                if not search_results:  # if after remove item list hasn't any item, means all search results deleted
                     return "Search_results_deleted"
 
                 else:  # if items still exist in search_data, return Success cause return to show_saved_accounts()
@@ -83,9 +83,9 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
         return
 
     show_header(menu_titles["manage"])
-    search_data = []
     menu_stack = []
-    item_index = []
+    item_index = None
+    search_results = None
 
     while True:
         if not menu_stack:
@@ -104,40 +104,41 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
             current_menu = menu_stack[-1]
 
             if current_menu == "search":
-                result = search_accounts()
+                search_results = search_accounts()
 
-                if not result:
+                if not search_results:
                     show_message(messages["error"]["not_found"])
                     menu_stack.pop()
 
                 else:
-                    choice = select_account(result)
-                    if choice == "Back to previous menu":
-                        menu_stack.pop()
-                    else:
-                        # choose from search results. need convert to exact index in original list
-                        item_index.append(accounts_list.index(result[choice]))
-                        menu_stack.append("show_details")
+                    menu_stack.append("select_accounts")
 
             elif current_menu == "select_accounts":
-                item_index.clear()  # delete previous item indexes to prevent infinite re-entry
-                choice = select_account(accounts_list)
+                # Show search results if available (user came from search menu); otherwise display all saved accounts.
+                if search_results:  # If user comes from search menu, search_results isn't 'None'
+                    choice = select_account(search_results)
+                    # 'Back to previous menu' option should not be treated as an account index.
+                    # Ensure user choice is not a string to avoid TypeError when used as index.
+                    if isinstance(choice, int):
+                        choice = accounts_list.index(search_results[choice])
+                else:
+                    choice = select_account(accounts_list)
                 if choice == "Back to previous menu":
                     # Prevent infinite loop by skipping to parent menu when previous menu was 'search_password'
-                    if len(menu_stack) >= 2 and menu_stack[-2] == "search":
+                    if search_results:
                         del menu_stack[-2:]
                         # Clear temporary search results from display list after service display completes
-                        search_data.clear()
+                        search_results.clear()
 
                     else:
                         menu_stack.pop()
 
                 else:
                     menu_stack.append("show_details")
-                    item_index.append(choice)
+                    item_index = choice
 
             elif current_menu == "show_details":
-                choice = account_details(accounts_list[item_index[-1]], menu_options["manage"]["saved_accounts"])
+                choice = account_details(accounts_list[item_index], menu_options["manage"]["saved_accounts"])
 
                 if choice == 1:
                     menu_stack.append("edit")
@@ -149,7 +150,7 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
                     menu_stack.pop()
 
             elif current_menu == "edit":
-                edit_account(accounts_list, item_index[-1], unique_keys, recycle_bin_data)
+                edit_account(accounts_list, item_index, unique_keys, recycle_bin_data)
                 menu_stack.pop()
 
             elif current_menu == "delete":
