@@ -6,8 +6,7 @@ Updates service name and username in the unique_keys set.
 Saves encrypted credentials to JSON file.
 """
 
-from ..common import show_and_get, menu_options, messages
-from ..utils import show_message
+from ..common import BaseMenu, menu_options, messages
 from ..utils import save_data
 
 
@@ -49,7 +48,7 @@ def edit_account(accounts_list, item_index, unique_keys, recycle_bin_data):
         while True:
             new_service_name = input(messages["prompt"]["new_service"]).strip().lower()
             if not new_service_name:
-                show_message(messages["error"]["empty_service_field"])
+                BaseMenu.show_message(messages["error"]["empty_service_field"])
                 continue
 
             else:
@@ -59,11 +58,11 @@ def edit_account(accounts_list, item_index, unique_keys, recycle_bin_data):
 
         # check for duplication
         if is_duplicate_key(new_key):
-            show_message(messages["error"]["exist"])
+            BaseMenu.show_message(messages["error"]["exist"])
             return None
 
         accounts_list[item_index]["service_name"] = new_service_name
-        show_message(messages["success"]["service_updated"])
+        BaseMenu.show_message(messages["success"]["service_updated"])
         return new_key
 
 
@@ -78,7 +77,7 @@ def edit_account(accounts_list, item_index, unique_keys, recycle_bin_data):
         while True:
             new_username = input(messages["prompt"]["new_username"]).strip().lower()
             if not new_username:
-                show_message(messages["error"]["empty_username_field"])
+                BaseMenu.show_message(messages["error"]["empty_username_field"])
                 continue
 
             else:
@@ -87,11 +86,11 @@ def edit_account(accounts_list, item_index, unique_keys, recycle_bin_data):
         new_key = (accounts_list[item_index]["service_name"], new_username)
 
         if is_duplicate_key(new_key):
-            show_message(messages["error"]["exist"])
+            BaseMenu.show_message(messages["error"]["exist"])
             return None
 
         accounts_list[item_index]["username"] = new_username
-        show_message(messages["success"]["username_updated"])
+        BaseMenu.show_message(messages["success"]["username_updated"])
         return new_key
 
 
@@ -101,14 +100,14 @@ def edit_account(accounts_list, item_index, unique_keys, recycle_bin_data):
         while True:
             new_password = input(messages["prompt"]["new_password"]).strip()
             if not new_password:
-                show_message(messages["error"]["empty_password_field"])
+                BaseMenu.show_message(messages["error"]["empty_password_field"])
                 continue
 
             else:
                 break
 
         accounts_list[item_index]["password"] = new_password
-        show_message(messages["success"]["password_updated"])
+        BaseMenu.show_message(messages["success"]["password_updated"])
 
 
     def edit_all():
@@ -122,7 +121,7 @@ def edit_account(accounts_list, item_index, unique_keys, recycle_bin_data):
         while True:
             new_service_name = input(messages["prompt"]["new_service"]).strip().lower()
             if not new_service_name:
-                show_message(messages["error"]["empty_service_field"])
+                BaseMenu.show_message(messages["error"]["empty_service_field"])
                 continue
 
             else:
@@ -131,7 +130,7 @@ def edit_account(accounts_list, item_index, unique_keys, recycle_bin_data):
         while True:
             new_username = input(messages["prompt"]["new_username"]).strip().lower()
             if not new_username:
-                show_message(messages["error"]["empty_username_field"])
+                BaseMenu.show_message(messages["error"]["empty_username_field"])
                 continue
 
             else:
@@ -139,13 +138,13 @@ def edit_account(accounts_list, item_index, unique_keys, recycle_bin_data):
 
         new_key = (new_service_name, new_username)
         if is_duplicate_key(new_key):
-            show_message(messages["error"]["exist"])
+            BaseMenu.show_message(messages["error"]["exist"])
             return None
 
         while True:
             new_password = input(messages["prompt"]["new_password"]).strip()
             if not new_password:
-                show_message(messages["error"]["empty_password_field"])
+                BaseMenu.show_message(messages["error"]["empty_password_field"])
                 continue
 
             else:
@@ -154,10 +153,10 @@ def edit_account(accounts_list, item_index, unique_keys, recycle_bin_data):
         accounts_list[item_index]["service_name"] = new_service_name
         accounts_list[item_index]["username"] = new_username
         accounts_list[item_index]["password"] = new_password
-        show_message(messages["success"]["information_updated"])
+        BaseMenu.show_message(messages["success"]["information_updated"])
         return new_key
 
-    choice = show_and_get(menu_options["manage"]["edit"], messages["prompt"]["choice"])
+    choice = BaseMenu.get_and_validate(menu_options["manage"]["edit"], messages["prompt"]["choice"])
 
     # current service name and username in vault
     old_key = (accounts_list[item_index]["service_name"], accounts_list[item_index]["username"])

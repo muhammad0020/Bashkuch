@@ -6,11 +6,10 @@ Updates the unique_keys set and saves data after deletion.
 
 from .edit_accounts import edit_account
 
-from ..common import  show_header, show_and_get
+from ..common import  BaseMenu
 from ..common import  menu_titles, menu_options, messages
 
-from ..utils import delete_accounts
-from ..utils import show_message, account_details, select_account
+from ..utils import delete_accounts, select_account, account_details
 
 
 def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
@@ -22,7 +21,7 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
         - recycle_bin_data (list): List of deleted accounts in deleted_accounts list.
         - unique_keys (set): Set of unique service names and usernames to prevent save duplicated accounts.
     """
-
+    account_manager = BaseMenu()
     def search_accounts() -> list:
         """
         Searches vault by service name and displays matching accounts.
@@ -36,17 +35,17 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
 
 
     if not accounts_list:
-        show_message(messages["error"]["no_password"])
+        account_manager.show_message(messages["error"]["no_password"])
         return
 
-    show_header(menu_titles["manage"])
+    account_manager.show_header(menu_titles["manage"])
     menu_stack = []
     item_index = None
     search_results = None
 
     while True:
         if not menu_stack:
-            choice = show_and_get(menu_options["manage"]["main"], messages["prompt"]["choice"])
+            choice = BaseMenu.get_and_validate(menu_options["manage"]["main"], messages["prompt"]["choice"])
 
             if choice == 1:
                 menu_stack.append("search")
@@ -64,7 +63,7 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
                 search_results = search_accounts()
 
                 if not search_results:
-                    show_message(messages["error"]["not_found"])
+                    BaseMenu.show_message(messages["error"]["not_found"])
                     menu_stack.pop()
 
                 else:

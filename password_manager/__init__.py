@@ -6,5 +6,5 @@ from .core.generate_password import password_generator
 from .core.delete_accounts import recycle_bin
 
 from .utils.manage_data import load_data
-from .common import show_header, show_and_get, clear_terminal
+from .common import BaseMenu
 from .common import menu_titles, menu_options, messages

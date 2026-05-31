@@ -15,9 +15,6 @@ Typical usage:
 from pathlib import Path
 from cryptography.fernet import Fernet
 
-from .show_and_get_data import show_message
-from .data_dictionaries import messages
-
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 SECRET_KEY_PATH = PROJECT_ROOT / "saved_data" / "secret.key"
 _KEY_CACHE = None  # Cache Fernet key for performance
@@ -38,7 +35,6 @@ def _generate_key():
         with open(SECRET_KEY_PATH, "wb") as key_file:
             key_file.write(key)
             _KEY_CACHE = key
-        show_message(messages["success"]["key"])
     # Catch all OS-level errors (permissions, disk full) to re-raise with context
     except OSError:
         raise  # Re-raise the exception to let the caller handle it

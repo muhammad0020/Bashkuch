@@ -6,9 +6,8 @@ Collects service name, username, and password from the user and encrypts them us
 Stores encrypted data in JSON file.
 """
 
-from ..common import show_header, clear_terminal
+from ..common import BaseMenu
 from ..common import menu_titles, messages
-from ..utils import show_message
 from ..utils import save_data
 
 
@@ -22,43 +21,44 @@ def create_accounts(accounts: list, deleted_accounts: list, unique_keys: set):
         - deleted_accounts: accounts that have been deleted by user.
         - unique_keys: Set of unique service names and usernames.
     """
-    show_header(menu_titles["add"])
+    account_creator = BaseMenu()
+    account_creator.show_header(menu_titles["add"])
     chars_limit = 30
     # Nested loop re-prompts user for username/service name when entries are exists in saved accounts
     while True:
         while True:
             service_name = input(messages["prompt"]["service_name"]).strip().lower()
             if not service_name:
-                show_message(messages["error"]["empty_service_field"])
+                account_creator.show_message(messages["error"]["empty_service_field"])
                 continue
             if len(service_name) > chars_limit:
-                show_message(messages["error"]["too_long_service_name"])
+                account_creator.show_message(messages["error"]["too_long_service_name"])
                 continue
             break
 
         while True:
             username = input(messages["prompt"]["username"]).strip().lower()
             if not username:
-                show_message(messages["error"]["empty_username_field"])
+                account_creator.show_message(messages["error"]["empty_username_field"])
                 continue
             if len(username) > chars_limit:
-                show_message(messages["error"]["too_long_username"])
+                account_creator.show_message(messages["error"]["too_long_username"])
                 continue
             break
 
         key = (service_name, username)
         if key in unique_keys:
-            show_message(messages["error"]["exist"])
+            account_creator.show_message(messages["error"]["exist"])
             continue
         break
 
     while True:
         password = input(messages["prompt"]["password"]).strip()
         if not password:
-            show_message(messages["error"]["empty_password_field"])
+            account_creator.show_message(messages["error"]["empty_password_field"])
             continue
         if len(password) > chars_limit:
-            show_message(messages["error"]["too_long_password"])
+            account_creator.show_message(messages["error"]["too_long_password"])
             continue
         break
 
@@ -70,5 +70,5 @@ def create_accounts(accounts: list, deleted_accounts: list, unique_keys: set):
 
     save_data(accounts, deleted_accounts)
     unique_keys.add(key)
-    clear_terminal()
-    show_message(messages["success"]["saved"])
+    account_creator.clear_terminal()
+    account_creator.show_message(messages["success"]["saved"])

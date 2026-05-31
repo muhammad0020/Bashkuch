@@ -15,110 +15,122 @@ Features:
 - Supports account viewing.
 """
 
-from os import name, system
+import os
 from time import sleep
 from inspect import cleandoc
 
 from .data_dictionaries import messages
 
-def clear_terminal(delay=0):
-    """
-    Clears terminal screen after specified delay (default: 0 seconds).
 
-    Parameters:
-        - delay (int): Seconds to wait before clearing terminal.
-    """
-
-    sleep(delay)
-
-    # check what type of OS is
-    if name == "nt": # windows OS
-        system("cls") # clear terminal
-
-    else:
-        system("clear")
-
-
-def show_header(title):
-    """
-    Displays program header for menus.
-
-    Parameters:
-        - title (str): Title of current menu.
-    """
-
-    print("=" * 46)
-    print(f"|{title.center(44)}|") # print title in center of frame
-    print("=" * 46)
-
-
-def show_message(message, delay=2):
-    """
-    Prints message and auto-clears screen after delay (default: 2 seconds).
-
-    Parameters:
-        - message (str): Specific message to center in frame.
-        - delay (int): Seconds to wait before clearing screen.
-    """
-
-    print("=" * 46)
-    print(f"|{message.center(44)}|")
-    print("=" * 46)
-    print()
-
-    clear_terminal(delay)
-
-
-def show_and_get(menu_options, prompt, convert_to_index=False):
-    """
-    Renders menu options and returns validated user selection.
-
-    Parameters:
-        - menu_options (list, tuple, dict): Menu options that prints by show_menu().
-        - prompt (str): Specific prompt message use for show to user in get_and_validate().
-        - convert_to_index (bool): If True convert user input to index of list(default: False).
-
-    Returns:
-        - get_and_validate:
-            - Validated user input (int). If convert_to_index is True returns user input - 1.
-    """
-
-    def show_menu():
-        """Displays menu options for current function."""
-
-        print("=" * 46)
-        for index, option in enumerate(menu_options, start=1):
-            print(f"|{index}.{option} ")
-        print("=" * 46)
-
-
-    def get_and_validate():
+class BaseMenu:
+    @staticmethod
+    def clear_terminal(delay: int=0):
         """
-        Prompts for user input with validation. Returns validated data.
+        Clears terminal screen after specified delay (default: 0 seconds).
+
+        Parameters:
+            - delay: Seconds to wait before clearing terminal.
+        """
+        sleep(delay)
+        # Use 'cls' on Windows, 'clear' on Unix-like systems to clear the screen.
+        os.system("cls" if os.name == "nt" else "clear")
+
+    @staticmethod
+    def show_header(title: str):
+        """
+        Displays program header for menus.
+
+        Parameters:
+            - title: Title of current menu.
+        """
+        print("=" * 46)
+        print(f"|{title.center(44)}|")
+        print("=" * 46)
+
+    @classmethod
+    def show_message(cls, message: str):
+        """
+        Prints message and auto-clears screen after delay (default: 2 seconds).
+
+        Parameters:
+            - message (str): Specific message to center in frame.
+        """
+        print("=" * 46)
+        print(f"|{message.center(44)}|")
+        print("=" * 46)
+        print()
+        cls.clear_terminal(2)
+
+    @staticmethod
+    def _show_menu(options: dict | list | tuple):
+        """Displays menu options for current function."""
+        print("=" * 46)
+        for row, option in enumerate(options, start=1):
+            print(f"|{row}.{option:<42}|")
+        print("=" * 46)
+
+    @staticmethod
+    def _validation(user_input: str, limit: int) -> tuple[bool, int | None]:
+        """
+         Validate and convert user input to an integer within a specified range.
+
+        Attempts to parse the input string as an integer and checks if it falls
+        within the interval (0, limit]. Serves as a helper for menu selection validation.
+
+        Parameters:
+            user_input: Raw string entered by the user (e.g., "3").
+            limit: Maximum allowed value (inclusive). Minimum is always 1.
 
         Returns:
-            - Validated user input (int). If convert_to_index is True returns user input - 1.
+            A tuple (is_valid, value):
+                - is_valid (bool): True if input is an integer between 1 and limit, else False.
+                - value (int | None): The parsed integer if is_valid is True, otherwise None.
         """
-
-        while True:
-            try:
-                choice = int(input(cleandoc(prompt)))
-
-                if not 0 < choice <= len(menu_options):
-                    raise ValueError
-            except ValueError:
-                show_message(messages["error"]["invalid"])
-                continue
-
-            if convert_to_index:
-                return choice - 1  # convert choice to list index to access list elements
-
+        try:
+            choice = int(user_input)
+            if 0 < int(user_input) <= limit:
+                return True, choice
             else:
-                return choice  # doesn't need index of list
+                return False, None
+        except ValueError:
+            return False, None
 
+    @classmethod
+    def get_and_validate(cls, options: dict | list | tuple, prompt: str,
+                         error: str="Invalid input", *, convert_to_index: bool=False) -> int:
+        """
+        Display a menu, prompt the user, and return a validated integer choice.
 
-    show_menu()
-    return get_and_validate()
+        This class method renders the given options (dictionary, list, or tuple),
+        repeatedly asks for input until a valid selection within the available
+        range is entered, and optionally converts the 1‑based user choice to
+        a 0‑based index.
+
+        Parameters:
+            options: A collection of menu items to display.
+                     - If a dict, keys are used as option identifiers.
+                     - If a list or tuple, the items are shown as numbered options.
+            prompt: The message displayed to the user for input.
+            error: Optional error message shown when validation fails.
+                   Defaults to "Invalid input".
+            convert_to_index: If True, returns the choice minus 1 (0‑based index);
+                              otherwise returns the raw 1‑based integer choice.
+                              Defaults to False.
+
+        Returns:
+            int: A valid integer representing the user's choice. If convert_to_index
+                 is True, the returned value is in the range [0, len(options)-1];
+                 otherwise it is in the range [1, len(options)].
+
+        """
+        cls._show_menu(options)
+        while True:
+            choice = input(cleandoc(prompt))
+            success, choice = cls._validation(choice, len(options))
+            if success:
+                return (choice - 1) if convert_to_index else choice
+            cls.show_message(error)
+            continue
 
 
 def select_account(accounts: list) -> str | int:
@@ -137,7 +149,7 @@ def select_account(accounts: list) -> str | int:
         - index: Index of selected account in the original given list.
     """
     service_names = get_service_names(accounts)  # for show as menu_options
-    index = show_and_get(service_names, messages["prompt"]["choose_service"], convert_to_index=True)
+    index = BaseMenu.get_and_validate(service_names, messages["prompt"]["choose_service"], convert_to_index=True)
     if service_names[index] == "Back to previous menu":
         return "Back to previous menu"
     return index
@@ -157,7 +169,7 @@ def account_details(account: dict, menu_options: dict) -> int:
         Password: {account["password"]}
         """))
     print("=" * 46)
-    return show_and_get(menu_options, messages["prompt"]["choice"])
+    return BaseMenu.get_and_validate(menu_options, messages["prompt"]["choice"])
 
 
 def get_service_names(accounts_list, sort_key=None):

@@ -6,7 +6,7 @@ from inspect import currentframe, getframeinfo
 
 import pyperclip
 
-from .show_and_get_data import show_message, show_and_get
+from .show_and_get_data import BaseMenu
 from .data_dictionaries import messages, menu_options
 from .data_encryption import encrypt_data, decrypt_data
 
@@ -104,10 +104,10 @@ def copy_to_clipboard(text: str):
     """
     try:
         pyperclip.copy(text)
-        show_message(messages["success"]["copied"])
+        BaseMenu.show_message(messages["success"]["copied"])
     # Display specific error message: missing tool or clipboard access problem.
     except pyperclip.PyperclipException:
-        show_message(messages["error"]["not_copied"])
+        BaseMenu.show_message(messages["error"]["not_copied"])
 
 
 def delete_accounts(accounts: list[dict],
@@ -135,7 +135,7 @@ def delete_accounts(accounts: list[dict],
         display_message = messages["prompt"]["delete_confirmation"]
     else:
         display_message = messages["prompt"]["delete_last_confirmation"]
-    confirmation = show_and_get(menu_options["manage"]["delete"], display_message)
+    confirmation = BaseMenu.get_and_validate(menu_options["manage"]["delete"], display_message)
 
     if confirmation == 1:  # confirm delete account
         if file_name == "manage_accounts":
@@ -145,11 +145,11 @@ def delete_accounts(accounts: list[dict],
             deleted_accounts.pop(index)
 
         save_data(accounts, deleted_accounts)
-        show_message(messages["success"]["deleted"])
+        BaseMenu.show_message(messages["success"]["deleted"])
         lst = accounts if file_name == "manage_accounts" else deleted_accounts
 
         if not lst:
-            show_message(messages["error"]["no_password"])
+            BaseMenu.show_message(messages["error"]["no_password"])
             return "Empty"
         else:
             return "Success"

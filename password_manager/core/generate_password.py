@@ -10,7 +10,7 @@ Ensures diversity to prevent common attacks.
 import string
 import random
 
-from ..common import show_header, show_and_get
+from ..common import BaseMenu
 from ..common import menu_titles, menu_options, messages
 from ..utils.manage_data import copy_to_clipboard
 
@@ -63,24 +63,23 @@ def password_generator():
 
         return has_upper and has_lower and has_digit and has_symbol
 
-
+    password_creator = BaseMenu()
     while True:
         generated_password = generate_password()
 
         # Ensure password has all character types (retries on failure)
         if not is_password_strong(generated_password):
             continue
-
-        show_header(menu_titles["generate"])
+        password_creator.show_header(menu_titles["generate"])
         print(f"Generated password:   {generated_password}")
 
-        selection = show_and_get(menu_options["generate"]["main"], messages["prompt"]["choice"])
+        selection = password_creator.get_and_validate(menu_options["generate"]["main"], messages["prompt"]["choice"])
         if selection == 1:  # Generate another password
             continue
 
         elif selection == 2:
             copy_to_clipboard(generated_password)
-            option = show_and_get(menu_options["generate"]["after_copy"], messages["prompt"]["choice"])
+            option = password_creator.get_and_validate(menu_options["generate"]["after_copy"], messages["prompt"]["choice"])
             if option == 1:
                 continue
 

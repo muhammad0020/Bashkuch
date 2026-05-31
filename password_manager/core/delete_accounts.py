@@ -6,10 +6,9 @@ Prevents restoring duplicated accounts to maintain data integrity.
 Saves data after each operation.
 """
 
-from ..common import show_header, show_and_get
+from ..common import BaseMenu
 from ..common import menu_titles, menu_options, messages
-from ..utils import select_account, show_message, account_details
-from ..utils import delete_accounts, save_data
+from ..utils import delete_accounts, save_data, select_account, account_details
 
 
 def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
@@ -21,7 +20,7 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
         - recycle_bin_data (list, dict): List of deleted accounts in deleted_accounts list.
         - unique_keys (set): Set of unique service names and usernames to prevent save duplicated accounts.
     """
-
+    recycle_bin_menu = BaseMenu()
     def restore():
         """
         Restores deleted account to vault end if not already present.
@@ -40,17 +39,17 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
             accounts_list.append(recycle_bin_data.pop(list_index))
             unique_keys.add((accounts_list[-1]["service_name"], accounts_list[-1]["username"]))
             save_data(accounts_list, recycle_bin_data)
-            show_message(messages["success"]["restored"])
+            recycle_bin_menu.show_message(messages["success"]["restored"])
 
             if not recycle_bin_data:
-                show_message(messages["error"]["bin_empty"])
+                recycle_bin_menu.show_message(messages["error"]["bin_empty"])
                 return "Empty"
 
             else:
                 return "Success"
 
         else:
-            show_message(messages["error"]["exist"])
+            recycle_bin_menu.show_message(messages["error"]["exist"])
             return "Back to previous menu"
 
 
@@ -63,12 +62,12 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
             - Back to previous menu (str): If user select 'Back to previous menu' option.
         """
 
-        decision = show_and_get(menu_options["recycle"]["delete"], messages["prompt"]["remove_all_confirmation"])
+        decision = recycle_bin_menu.get_and_validate(menu_options["recycle"]["delete"], messages["prompt"]["remove_all_confirmation"])
 
         if decision == 1:
             recycle_bin_data.clear()
             save_data(accounts_list, recycle_bin_data)
-            show_message(messages["success"]["emptied"])
+            recycle_bin_menu.show_message(messages["success"]["emptied"])
             return "Exit"
 
         else:
@@ -77,16 +76,16 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
 
     # check deleted_accounts list not empty
     if not recycle_bin_data:
-        show_message(messages["error"]["bin_empty"])
+        recycle_bin_menu.show_message(messages["error"]["bin_empty"])
         return
 
-    show_header(menu_titles["recycle"])
+    recycle_bin_menu.show_header(menu_titles["recycle"])
     menu_stack = []
     item_index = []
 
     while True:
         if not menu_stack:
-            choice = show_and_get(menu_options["recycle"]["main"], messages["prompt"]["choice"])
+            choice = recycle_bin_menu.get_and_validate(menu_options["recycle"]["main"], messages["prompt"]["choice"])
             if choice == 1:
                 menu_stack.append("show_accounts")
 

@@ -15,7 +15,7 @@ from password_manager import password_generator
 from password_manager import recycle_bin
 
 from password_manager import load_data
-from password_manager import show_header, show_and_get, clear_terminal
+from password_manager import BaseMenu
 from password_manager import menu_titles, menu_options, messages
 
 # TODO: Add service names sort and filter, copy option to manage_passwords function
@@ -29,10 +29,10 @@ def main():
 
     for item in vault:
         unique_service_users.add((item["service_name"], item["username"]))
-
+    main_menu = BaseMenu()
     while True:
-        show_header(menu_titles["main"])
-        choice = show_and_get(menu_options["main"]["main"], messages["prompt"]["choice"])
+        main_menu.show_header(menu_titles["main"])
+        choice = main_menu.get_and_validate(menu_options["main"]["main"], messages["prompt"]["choice"])
 
         if choice == 1:
             create_accounts(vault, deleted_accounts, unique_service_users)
@@ -47,11 +47,11 @@ def main():
             recycle_bin(vault, deleted_accounts, unique_service_users)
 
         else:
-            decision = show_and_get(menu_options["main"]["exit"], messages["prompt"]["exit"])
+            decision = main_menu.get_and_validate(menu_options["main"]["exit"], messages["prompt"]["exit"])
             if decision == 2:
                 sys.exit(0)
 
-        clear_terminal()
+        main_menu.clear_terminal()
 
 
 if __name__ == "__main__":
