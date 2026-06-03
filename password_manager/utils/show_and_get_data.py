@@ -78,9 +78,9 @@ class BaseMenu:
         print("=" * 46)
 
     @staticmethod
-    def _validation(user_input: str, limit: int) -> tuple[bool, int | None]:
+    def _validate_menu_selection(user_input: str, limit: int) -> bool:
         """
-         Validate and convert user input to an integer within a specified range.
+        Validate and convert user input to an integer within a specified range.
 
         Attempts to parse the input string as an integer and checks if it falls
         within the interval (0, limit]. Serves as a helper for menu selection validation.
@@ -90,22 +90,15 @@ class BaseMenu:
             limit: Maximum allowed value (inclusive). Minimum is always 1.
 
         Returns:
-            A tuple (is_valid, value):
-                - is_valid (bool): True if input is an integer between 1 and limit, else False.
-                - value (int | None): The parsed integer if is_valid is True, otherwise None.
+            bool:
+                - True: If input is an integer between 1 and limit.
+                - False: If input is not an integer or is out of range.
         """
-        try:
-            choice = int(user_input)
-            if 0 < int(user_input) <= limit:
-                return True, choice
-            else:
-                return False, None
-        except ValueError:
-            return False, None
+        return user_input.isdecimal() and 0 < int(user_input) <= limit
 
     @classmethod
-    def get_and_validate(cls, options: dict | list | tuple, prompt: str,
-                         error: str="Invalid input", *, convert_to_index: bool=False) -> int:
+    def capture_menu_selection(cls, options: dict | list | tuple, prompt: str,
+                               error: str="Invalid input", *, convert_to_index: bool=False) -> int:
         """
         Display a menu, prompt the user, and return a validated integer choice.
 
@@ -129,17 +122,14 @@ class BaseMenu:
             int: A valid integer representing the user's choice. If convert_to_index
                  is True, the returned value is in the range [0, len(options)-1];
                  otherwise it is in the range [1, len(options)].
-
         """
         cls._show_menu(options)
         while True:
             choice = input(cleandoc(prompt))
-            success, choice = cls._validation(choice, len(options))
-            if success:
+            if cls._validate_menu_selection(choice, len(options)):
+                choice = int(choice)
                 return (choice - 1) if convert_to_index else choice
             cls.show_message(error)
-            continue
-
 
     def get_validated_string(self, prompt: str, errors: tuple[str, str],
                              *, validator: Callable[[str], str], transform: bool=True) -> str:
@@ -213,7 +203,7 @@ def select_account(accounts: list) -> str | int:
         - index: Index of selected account in the original given list.
     """
     service_names = get_service_names(accounts)  # for show as menu_options
-    index = BaseMenu.get_and_validate(service_names, messages["prompt"]["choose_service"], convert_to_index=True)
+    index = BaseMenu.capture_menu_selection(service_names, messages["prompt"]["choose_service"], convert_to_index=True)
     if service_names[index] == "Back to previous menu":
         return "Back to previous menu"
     return index
@@ -233,7 +223,7 @@ def account_details(account: dict, menu_options: dict) -> int:
         Password: {account["password"]}
         """))
     print("=" * 46)
-    return BaseMenu.get_and_validate(menu_options, messages["prompt"]["choice"])
+    return BaseMenu.capture_menu_selection(menu_options, messages["prompt"]["choice"])
 
 
 def get_service_names(accounts_list, sort_key=None):

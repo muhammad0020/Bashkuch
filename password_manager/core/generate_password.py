@@ -73,13 +73,13 @@ def password_generator():
         password_creator.show_header(menu_titles["generate"])
         print(f"Generated password:   {generated_password}")
 
-        selection = password_creator.get_and_validate(menu_options["generate"]["main"], messages["prompt"]["choice"])
+        selection = password_creator.capture_menu_selection(menu_options["generate"]["main"], messages["prompt"]["choice"])
         if selection == 1:  # Generate another password
             continue
 
         elif selection == 2:
             copy_to_clipboard(generated_password)
-            option = password_creator.get_and_validate(menu_options["generate"]["after_copy"], messages["prompt"]["choice"])
+            option = password_creator.capture_menu_selection(menu_options["generate"]["after_copy"], messages["prompt"]["choice"])
             if option == 1:
                 continue
 

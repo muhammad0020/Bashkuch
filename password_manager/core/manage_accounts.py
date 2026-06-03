@@ -45,7 +45,7 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
 
     while True:
         if not menu_stack:
-            choice = BaseMenu.get_and_validate(menu_options["manage"]["main"], messages["prompt"]["choice"])
+            choice = BaseMenu.capture_menu_selection(menu_options["manage"]["main"], messages["prompt"]["choice"])
 
             if choice == 1:
                 menu_stack.append("search")

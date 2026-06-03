@@ -33,7 +33,7 @@ def main():
     main_menu = BaseMenu()
     while True:
         main_menu.show_header(menu_titles["main"])
-        choice = main_menu.get_and_validate(menu_options["main"]["main"], messages["prompt"]["choice"])
+        choice = main_menu.capture_menu_selection(menu_options["main"]["main"], messages["prompt"]["choice"])
         manager = AccountManager(vault, deleted_accounts, unique_service_users)
         if choice == 1:
             creator = AccountCreatorMenu(manager)
@@ -49,7 +49,7 @@ def main():
             recycle_bin(vault, deleted_accounts, unique_service_users)
 
         else:
-            decision = main_menu.get_and_validate(menu_options["main"]["exit"], messages["prompt"]["exit"])
+            decision = main_menu.capture_menu_selection(menu_options["main"]["exit"], messages["prompt"]["exit"])
             if decision == 2:
                 sys.exit(0)
 

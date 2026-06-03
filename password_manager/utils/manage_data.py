@@ -135,7 +135,7 @@ def delete_accounts(accounts: list[dict],
         display_message = messages["prompt"]["delete_confirmation"]
     else:
         display_message = messages["prompt"]["delete_last_confirmation"]
-    confirmation = BaseMenu.get_and_validate(menu_options["manage"]["delete"], display_message)
+    confirmation = BaseMenu.capture_menu_selection(menu_options["manage"]["delete"], display_message)
 
     if confirmation == 1:  # confirm delete account
         if file_name == "manage_accounts":

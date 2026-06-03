@@ -156,7 +156,7 @@ def edit_account(accounts_list, item_index, unique_keys, recycle_bin_data):
         BaseMenu.show_message(messages["success"]["information_updated"])
         return new_key
 
-    choice = BaseMenu.get_and_validate(menu_options["manage"]["edit"], messages["prompt"]["choice"])
+    choice = BaseMenu.capture_menu_selection(menu_options["manage"]["edit"], messages["prompt"]["choice"])
 
     # current service name and username in vault
     old_key = (accounts_list[item_index]["service_name"], accounts_list[item_index]["username"])

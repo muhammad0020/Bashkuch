@@ -62,7 +62,7 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
             - Back to previous menu (str): If user select 'Back to previous menu' option.
         """
 
-        decision = recycle_bin_menu.get_and_validate(menu_options["recycle"]["delete"], messages["prompt"]["remove_all_confirmation"])
+        decision = recycle_bin_menu.capture_menu_selection(menu_options["recycle"]["delete"], messages["prompt"]["remove_all_confirmation"])
 
         if decision == 1:
             recycle_bin_data.clear()
@@ -85,7 +85,7 @@ def recycle_bin(accounts_list, recycle_bin_data, unique_keys):
 
     while True:
         if not menu_stack:
-            choice = recycle_bin_menu.get_and_validate(menu_options["recycle"]["main"], messages["prompt"]["choice"])
+            choice = recycle_bin_menu.capture_menu_selection(menu_options["recycle"]["main"], messages["prompt"]["choice"])
             if choice == 1:
                 menu_stack.append("show_accounts")
 
