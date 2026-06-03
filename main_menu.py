@@ -9,7 +9,8 @@ Maintains data integrity via unique_keys and Fernet encryption.
 
 import sys
 
-from password_manager import create_accounts
+from password_manager.core import AccountManager
+from password_manager import AccountCreatorMenu
 from password_manager import manage_passwords
 from password_manager import password_generator
 from password_manager import recycle_bin
@@ -33,9 +34,10 @@ def main():
     while True:
         main_menu.show_header(menu_titles["main"])
         choice = main_menu.get_and_validate(menu_options["main"]["main"], messages["prompt"]["choice"])
-
+        manager = AccountManager(vault, deleted_accounts, unique_service_users)
         if choice == 1:
-            create_accounts(vault, deleted_accounts, unique_service_users)
+            creator = AccountCreatorMenu(manager)
+            creator.run()
 
         elif choice == 2:
             manage_passwords(vault, deleted_accounts, unique_service_users)

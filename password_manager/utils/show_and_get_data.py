@@ -18,11 +18,19 @@ Features:
 import os
 from time import sleep
 from inspect import cleandoc
+from collections.abc import Callable
 
 from .data_dictionaries import messages
 
 
 class BaseMenu:
+    """
+    Abstract base class establishing the core interface for system menus.
+
+    This class provides the blueprint and shared foundational utilities for
+    rendering user interfaces, capturing input, and orchestrating menu-driven
+    application workflows.
+    """
     @staticmethod
     def clear_terminal(delay: int=0):
         """
@@ -131,6 +139,62 @@ class BaseMenu:
                 return (choice - 1) if convert_to_index else choice
             cls.show_message(error)
             continue
+
+
+    def get_validated_string(self, prompt: str, errors: tuple[str, str],
+                             *, validator: Callable[[str], str], transform: bool=True) -> str:
+        """
+        Repeatedly prompt the user for a string input until it passes validation.
+
+        The input is stripped of whitespace and converted to lowercase before being
+        passed to the validator function. Based on the validator's return value,
+        the method either returns the validated string or displays an appropriate
+        error message and retries.
+
+        Parameters:
+            prompt: The message displayed to the user when asking for input.
+
+            errors: A tuple of two error messages:
+                - errors[0] is shown when the validator returns 'empty' (empty input).
+                - errors[1] is shown when the validator returns 'too_long' (input exceeds the limit).
+
+            validator: A callable that takes a single string argument and returns:
+                - 'success': if the input is valid
+                - 'empty': if the input is empty
+                - 'too_long': if the input exceeds the limit.
+
+            transform:
+                - True (default): the input is stripped of leading/trailing whitespace
+                   (spaces, tabs, newlines) and converted to lowercase. Use this for
+                   service names and usernames where case and surrounding spaces are not
+                   significant.
+
+                - False: only the trailing newline character is removed (with .rstrip('\n'))
+                   and all other whitespace (leading/trailing spaces, tabs) is preserved.
+                   This is necessary for passwords where spaces, tabs, or other whitespace
+                   characters may be intentionally part of the secret.
+
+       Returns:
+            The validated string entered by the user. If transform was True, the string
+            has been stripped of leading/trailing whitespace and converted to lowercase.
+            If transform was False, only the trailing newline character is removed and
+            all other whitespace (including leading/trailing spaces/tabs) is preserved.
+        """
+        while True:
+            user_input = input(prompt)
+            status = validator(user_input)
+            if status == "success":
+                if transform:
+                    # Replaces internal tab characters with spaces to clean mid-string input,
+                    # then utilizes .strip() to eliminate any leading/trailing whitespace.
+                    return user_input.replace("\t", " ").strip().lower()
+                else:
+                    # Keep the password data 100% raw and untouched to preserve user secrets.
+                    return user_input
+            elif status == "empty":
+                self.show_message(errors[0])
+            elif status == "too_long":
+                self.show_message(errors[1])
 
 
 def select_account(accounts: list) -> str | int:
