@@ -20,8 +20,6 @@ from password_manager import load_data
 from password_manager import BaseMenu
 from password_manager import menu_titles, menu_options, messages
 
-# TODO: Add service names sort and filter, copy option to manage_passwords function
-# TODO: get_service_names function has incomplete service name sorter
 
 errors = {
     "permission": "Access Denied. Cannot read the storage file",
