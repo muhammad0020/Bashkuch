@@ -4,8 +4,6 @@ Account management: Handles account search, edit, and deletion operations.
 Updates the unique_keys set and saves data after deletion.
 """
 
-from .edit_accounts import edit_account
-
 from ..common import  BaseMenu
 from ..common import  menu_titles, menu_options, messages
 
