@@ -1,8 +1,19 @@
+# IDE / Editor Configurations
 .idea/
+
+# Python Virtual Environments
 venv/
+
+# Python Bytecode & Cache
 __pycache__/
 *.pyc
+
+# Security, Encryption Keys & Environment Variables
 secret.key
-data.json
 .env
-DS_Store
+
+# Local Data Storage / Persistence Layer
+data.json
+
+# Operating System Specific Files
+.DS_Store
