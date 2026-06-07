@@ -78,3 +78,35 @@ class AccountManager:
              })
         self.unique_keys.add(key)
         save_data(self.active_accounts, self.deleted_accounts)
+
+    def edit_account(self, account: dict, new_data: str, key:str, *, unique_key_update: bool=True):
+        """
+        Updates a specific field of an account and manages unique constraints.
+
+        Modifies the provided account dictionary with the new data. If unique_key_update
+        is enabled, it dynamically extracts the composite keys, updates the internal
+        uniqueness tracking set to prevent duplication, and then commits the changes
+        to the persistent storage.
+
+        Parameters:
+            account: The target account record to be modified.
+            new_data: The new value to assign to the target field.
+            key: The exact dictionary key to be updated.
+            unique_key_update (optional): Determines whether to recalculate
+                and refresh the composite unique keys cache. Defaults to True.
+
+        Side Effects:
+            - Modifies the state of `self.unique_keys` if unique_key_update is True.
+            - Invokes `save_data` to write the updated lists to disk.
+        """
+        if unique_key_update:
+            account_keys = list(account.keys())
+            old_unique_keys = (account[account_keys[0]], account[account_keys[1]])
+            self.unique_keys.discard(old_unique_keys)
+            account[key] = new_data
+            new_unique_keys = (account[account_keys[0]], account[account_keys[1]])
+            self.unique_keys.add(new_unique_keys)
+        else:
+            account[key] = new_data
+        save_data(self.active_accounts, self.deleted_accounts)
+

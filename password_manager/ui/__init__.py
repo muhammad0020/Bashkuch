@@ -1,1 +1,1 @@
-from .menus import AccountCreatorMenu
+from .menus import AccountCreatorMenu, AccountEditorMenu

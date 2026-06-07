@@ -9,6 +9,9 @@ from .edit_accounts import edit_account
 from ..common import  BaseMenu
 from ..common import  menu_titles, menu_options, messages
 
+from .account_manager import AccountManager
+from ..ui import AccountEditorMenu
+
 from ..utils import delete_accounts, select_account, account_details
 
 
@@ -22,6 +25,7 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
         - unique_keys (set): Set of unique service names and usernames to prevent save duplicated accounts.
     """
     account_manager = BaseMenu()
+    manager = AccountManager(accounts_list, recycle_bin_data, unique_keys)
     def search_accounts() -> list:
         """
         Searches vault by service name and displays matching accounts.
@@ -106,7 +110,8 @@ def manage_passwords(accounts_list, recycle_bin_data, unique_keys):
                     menu_stack.pop()
 
             elif current_menu == "edit":
-                edit_account(accounts_list, item_index, unique_keys, recycle_bin_data)
+                edit_menu = AccountEditorMenu(accounts_list[item_index], manager)
+                edit_menu.run()
                 menu_stack.pop()
 
             elif current_menu == "delete":
