@@ -4,13 +4,13 @@ Account management: Handles account search, edit, and deletion operations.
 Updates the unique_keys set and saves data after deletion.
 """
 
-from ..common import  BaseMenu
-from ..common import  menu_titles, menu_options, messages
+from utils import BaseMenu
+from utils import  menu_titles, menu_options, messages
 
 from .account_manager import AccountManager
-from ..ui import AccountEditorMenu
+from ui import AccountEditorMenu
 
-from ..utils import delete_accounts, select_account, account_details
+from utils import delete_accounts, select_account, account_details
 
 
 def manage_passwords(accounts_list, recycle_bin_data, unique_keys):

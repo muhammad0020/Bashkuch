@@ -15,7 +15,7 @@ Typical usage:
 from pathlib import Path
 from cryptography.fernet import Fernet
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent
 SECRET_KEY_PATH = PROJECT_ROOT / "saved_data" / "secret.key"
 _KEY_CACHE = None  # Cache Fernet key for performance
 

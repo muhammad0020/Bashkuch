@@ -10,9 +10,9 @@ Ensures diversity to prevent common attacks.
 import string
 import random
 
-from ..common import BaseMenu
-from ..common import menu_titles, menu_options, messages
-from ..utils.manage_data import copy_to_clipboard
+from utils import BaseMenu
+from utils import menu_titles, menu_options, messages
+from utils.manage_data import copy_to_clipboard
 
 
 def password_generator():

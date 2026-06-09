@@ -6,9 +6,9 @@ Prevents restoring duplicated accounts to maintain data integrity.
 Saves data after each operation.
 """
 
-from ..common import BaseMenu
-from ..common import menu_titles, menu_options, messages
-from ..utils import delete_accounts, save_data, select_account, account_details
+from utils import BaseMenu
+from utils import menu_titles, menu_options, messages
+from utils import delete_accounts, save_data, select_account, account_details
 
 
 def recycle_bin(accounts_list, recycle_bin_data, unique_keys):

@@ -10,7 +10,7 @@ from .show_and_get_data import BaseMenu
 from .data_dictionaries import messages, menu_options
 from .data_encryption import encrypt_data, decrypt_data
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent
 DATA_JSON_PATH = PROJECT_ROOT / "saved_data" / "data.json"
 
 

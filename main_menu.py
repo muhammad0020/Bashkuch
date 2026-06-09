@@ -10,15 +10,16 @@ Maintains data integrity via unique_keys and Fernet encryption.
 import sys
 import errno
 
-from password_manager.core import AccountManager
-from password_manager import AccountCreatorMenu
-from password_manager import manage_passwords
-from password_manager import password_generator
-from password_manager import recycle_bin
+from core import AccountManager
+from core import manage_passwords
+from core import password_generator
+from core import recycle_bin
 
-from password_manager import load_data
-from password_manager import BaseMenu
-from password_manager import menu_titles, menu_options, messages
+from ui import AccountCreatorMenu
+
+from utils import load_data
+from utils import BaseMenu
+from utils import menu_titles, menu_options, messages
 
 
 errors = {
