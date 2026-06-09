@@ -18,7 +18,7 @@ from core import recycle_bin
 from ui import AccountCreatorMenu
 
 from utils import load_data
-from utils import BaseMenu
+from ui import BaseMenu
 from utils import menu_titles, menu_options, messages
 
 

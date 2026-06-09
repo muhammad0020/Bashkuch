@@ -10,7 +10,7 @@ Ensures diversity to prevent common attacks.
 import string
 import random
 
-from utils import BaseMenu
+from ui import BaseMenu
 from utils import menu_titles, menu_options, messages
 from utils.manage_data import copy_to_clipboard
 

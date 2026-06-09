@@ -6,7 +6,7 @@ from inspect import currentframe, getframeinfo
 
 import pyperclip
 
-from .show_and_get_data import BaseMenu
+from ui import BaseMenu
 from .data_dictionaries import messages, menu_options
 from .data_encryption import encrypt_data, decrypt_data
 

@@ -1,4 +1,4 @@
-from utils import BaseMenu
+from .base_menu import BaseMenu
 
 class AccountCreatorMenu(BaseMenu):
     """
