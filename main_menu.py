@@ -11,9 +11,6 @@ import sys
 import errno
 
 from core import AccountManager
-from core import manage_passwords
-from core import password_generator
-from core import recycle_bin
 
 from ui import AccountCreatorMenu
 
@@ -50,13 +47,13 @@ def main():
                 creator.run()
 
             elif choice == 2:
-                manage_passwords(vault, deleted_accounts, unique_service_users)
+                main_menu.show_message("This feature is temporarily unavailable.")
 
             elif choice == 3:
-                password_generator()
+                main_menu.show_message("This feature is temporarily unavailable.")
 
             elif choice == 4:
-                recycle_bin(vault, deleted_accounts, unique_service_users)
+                main_menu.show_message("This feature is temporarily unavailable.")
 
             else:
                 decision = main_menu.capture_menu_selection(menu_options["main"]["exit"], messages["prompt"]["exit"])
