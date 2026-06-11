@@ -6,7 +6,7 @@ to the appropriate application workflows.
 """
 
 from .base_menu import BaseMenu
-from .menus import AccountCreatorMenu
+from .creator_menu import AccountCreatorMenu
 
 
 class MainMenu(BaseMenu):
