@@ -9,7 +9,7 @@ import sys
 import errno
 
 from core import AccountManager
-from utils import load_data
+from core import load_data
 from ui import BaseMenu, MainMenu
 from navigation import NavigateBack
 

@@ -1,4 +1,4 @@
-from utils import save_data
+from .storage import save_data
 
 class AccountManager:
     """
