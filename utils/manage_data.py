@@ -8,7 +8,7 @@ import pyperclip
 
 from ui import BaseMenu
 from .data_dictionaries import messages, menu_options
-from .data_encryption import encrypt_data, decrypt_data
+from core.encryption import encrypt_data, decrypt_data
 
 PROJECT_ROOT = Path(__file__).parent.parent
 DATA_JSON_PATH = PROJECT_ROOT / "saved_data" / "data.json"
