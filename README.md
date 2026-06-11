@@ -67,7 +67,7 @@ pip install -r requirements.txt
 ### 4. System Launch
 Execute the primary interface to start the application:
 ```bash
-python main_menu.py
+python app.py
 ```
 
 ---

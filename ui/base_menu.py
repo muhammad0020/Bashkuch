@@ -1,10 +1,21 @@
+"""
+Provides the base class for all application menus.
+
+Includes shared menu utilities and defines the contract
+that concrete menu implementations must implement.
+"""
+
+from __future__ import annotations
 import os
 from time import sleep
 from inspect import cleandoc
 from collections.abc import Callable
+from abc import ABC, abstractmethod
+
+from navigation import NavigateBack
 
 
-class BaseMenu:
+class BaseMenu(ABC):
     """
     Abstract base class establishing the core interface for system menus.
 
@@ -12,6 +23,19 @@ class BaseMenu:
     rendering user interfaces, capturing input, and orchestrating menu-driven
     application workflows.
     """
+    NAVIGATE_BACK_KEY = "q"
+
+    @abstractmethod
+    def run(self) -> BaseMenu | None:
+        """
+        Execute the menu logic and return the next menu to open.
+
+        Returns:
+        BaseMenu | None:
+        The next menu instance, or None to close the current menu.
+        """
+        pass
+
     @staticmethod
     def clear_terminal(delay: int=0):
         """
@@ -78,8 +102,11 @@ class BaseMenu:
         return user_input.isdecimal() and 0 < int(user_input) <= limit
 
     @classmethod
-    def capture_menu_selection(cls, options: dict | list | tuple, prompt: str,
-                               error: str="Invalid input", *, convert_to_index: bool=False) -> int:
+    def capture_menu_selection(cls, options: dict | list | tuple,
+                               prompt: str,
+                               error: str="Invalid input",
+                               *, convert_to_index: bool=False,
+                               allow_navigation_back: bool=True) -> int:
         """
         Display a menu, prompt the user, and return a validated integer choice.
 
@@ -87,6 +114,10 @@ class BaseMenu:
         repeatedly asks for input until a valid selection within the available
         range is entered, and optionally converts the 1‑based user choice to
         a 0‑based index.
+
+        If the user enters the value defined by NAVIGATE_BACK_KEY, the method
+        raises a NavigateBack exception to signal a request to return to the
+        previous menu in the navigation stack.
 
         Parameters:
             options: A collection of menu items to display.
@@ -98,6 +129,14 @@ class BaseMenu:
             convert_to_index: If True, returns the choice minus 1 (0‑based index);
                               otherwise returns the raw 1‑based integer choice.
                               Defaults to False.
+            allow_navigation_back:
+                Whether the user is allowed to navigate back to the previous menu using the back key.
+                 If True, pressing the back key raises a NavigateBack exception.
+                  If False, the back key is treated as invalid input. Defaults to True.
+
+        Raises:
+            NavigateBack: Triggered when the user requests navigation to the previous menu
+            by entering NAVIGATE_BACK_KEY.
 
         Returns:
             int: A valid integer representing the user's choice. If convert_to_index
@@ -106,7 +145,10 @@ class BaseMenu:
         """
         cls._show_menu(options)
         while True:
-            choice = input(cleandoc(prompt))
+            choice = input(cleandoc(prompt)).strip().lower()
+            if allow_navigation_back and choice == cls.NAVIGATE_BACK_KEY:
+                cls.clear_terminal()
+                raise NavigateBack
             if cls._validate_menu_selection(choice, len(options)):
                 choice = int(choice)
                 return (choice - 1) if convert_to_index else choice
@@ -121,6 +163,10 @@ class BaseMenu:
         passed to the validator function. Based on the validator's return value,
         the method either returns the validated string or displays an appropriate
         error message and retries.
+
+        If the user enters the value defined by NAVIGATE_BACK_KEY, the method
+        raises a NavigateBack exception to signal a request to return to the
+        previous menu in the navigation stack.
 
         Parameters:
             prompt: The message displayed to the user when asking for input.
@@ -145,6 +191,10 @@ class BaseMenu:
                    This is necessary for passwords where spaces, tabs, or other whitespace
                    characters may be intentionally part of the secret.
 
+        Raises:
+            NavigateBack: Triggered when the user requests navigation to the previous menu
+             by entering NAVIGATE_BACK_KEY.
+
        Returns:
             The validated string entered by the user. If transform was True, the string
             has been stripped of leading/trailing whitespace and converted to lowercase.
@@ -153,6 +203,9 @@ class BaseMenu:
         """
         while True:
             user_input = input(prompt)
+            if user_input.strip().lower() == self.NAVIGATE_BACK_KEY:
+                self.clear_terminal()
+                raise NavigateBack
             status = validator(user_input)
             if status == "success":
                 if transform:
