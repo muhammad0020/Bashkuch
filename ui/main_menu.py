@@ -7,6 +7,7 @@ to the appropriate application workflows.
 
 from .base_menu import BaseMenu
 from .creator_menu import AccountCreatorMenu
+from .generator_menu import PasswordGeneratorMenu
 
 
 class MainMenu(BaseMenu):
@@ -46,7 +47,7 @@ class MainMenu(BaseMenu):
             elif choice == 2:
                 self.show_message("This feature is temporarily unavailable.")
             elif choice == 3:
-                self.show_message("This feature is temporarily unavailable.")
+                return PasswordGeneratorMenu()
             elif choice == 4:
                 self.show_message("This feature is temporarily unavailable.")
             else:
