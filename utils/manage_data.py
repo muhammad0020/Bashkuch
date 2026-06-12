@@ -3,26 +3,9 @@
 from pathlib import Path
 from inspect import currentframe, getframeinfo
 
-import pyperclip
-
 from core.storage import save_data
 from ui import BaseMenu
 from .data_dictionaries import messages, menu_options
-
-
-def copy_to_clipboard(text: str):
-    """
-    Copies text to system clipboard using pyperclip module.
-
-    Parameters:
-        - text: Text to copy to clipboard.
-    """
-    try:
-        pyperclip.copy(text)
-        BaseMenu.show_message(messages["success"]["copied"])
-    # Display specific error message: missing tool or clipboard access problem.
-    except pyperclip.PyperclipException:
-        BaseMenu.show_message(messages["error"]["not_copied"])
 
 
 def delete_accounts(accounts: list[dict],

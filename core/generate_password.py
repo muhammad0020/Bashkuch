@@ -12,7 +12,7 @@ import random
 
 from ui import BaseMenu
 from utils import menu_titles, menu_options, messages
-from utils.manage_data import copy_to_clipboard
+from utils import copy_to_clipboard
 
 
 def password_generator():
