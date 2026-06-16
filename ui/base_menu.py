@@ -75,11 +75,43 @@ class BaseMenu(ABC):
         cls.clear_terminal(2)
 
     @staticmethod
-    def _show_menu(options: dict | list | tuple):
-        """Displays menu options for current function."""
+    def _show_menu(options: tuple):
+        """
+        Displays a formatted menu in the console.
+
+        Prints a numbered list of menu options with fixed-width alignment
+        for consistent CLI presentation.
+
+        Parameters:
+            - options: A collection of menu items to be displayed as selectable options.
+        """
         print("=" * 46)
         for row, option in enumerate(options, start=1):
             print(f"|{row}.{option:<42}|")
+        print("=" * 46)
+
+    @staticmethod
+    def _show_accounts(accounts: list[dict]):
+        """
+        Displays a formatted list of accounts in a console table view.
+
+        This function iterates over a list of account dictionaries and prints
+        each account with its row number, service name, and username in a structured format.
+
+        Parameters:
+            accounts:
+                A list of dictionaries where each dictionary represents an account
+                containing service name, username, and password.
+
+        Notes:
+            - Assumes dictionary values are ordered as: service_name, username, password
+            - Output is formatted for CLI display with fixed-width alignment
+            """
+        print("=" * 46)
+        for row, account in enumerate(accounts, start=1):
+            name, username, password = account.values()
+            content = f"{row}.{name}    {username}"
+            print(f"{content:<45}|")
         print("=" * 46)
 
     @staticmethod
@@ -102,7 +134,7 @@ class BaseMenu(ABC):
         return user_input.isdecimal() and 0 < int(user_input) <= limit
 
     @classmethod
-    def capture_menu_selection(cls, options: dict | list | tuple,
+    def capture_menu_selection(cls, options: tuple | list[dict],
                                prompt: str,
                                error: str="Invalid input",
                                *, convert_to_index: bool=False,
@@ -120,9 +152,7 @@ class BaseMenu(ABC):
         previous menu in the navigation stack.
 
         Parameters:
-            options: A collection of menu items to display.
-                     - If a dict, keys are used as option identifiers.
-                     - If a list or tuple, the items are shown as numbered options.
+            options: A collection of menu items or accounts list to display.
             prompt: The message displayed to the user for input.
             error: Optional error message shown when validation fails.
                    Defaults to "Invalid input".
@@ -143,7 +173,10 @@ class BaseMenu(ABC):
                  is True, the returned value is in the range [0, len(options)-1];
                  otherwise it is in the range [1, len(options)].
         """
-        cls._show_menu(options)
+        # If convert_to_index is True, we use _show_accounts because the options
+        # represent account objects that need formatted display.
+        # Otherwise, we use _show_menu for standard menu options.
+        cls._show_accounts(options) if convert_to_index else cls._show_menu(options)
         while True:
             choice = input(cleandoc(prompt)).strip().lower()
             if allow_navigation_back and choice == cls.NAVIGATE_BACK_KEY:

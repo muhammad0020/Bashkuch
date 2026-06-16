@@ -11,7 +11,7 @@ import errno
 from core import AccountManager
 from core import load_data
 from ui import BaseMenu, MainMenu
-from navigation import NavigateBack
+from navigation import NavigateBack, NavigateTwoStepsBack
 
 
 errors = {
@@ -49,6 +49,9 @@ def main():
 
         except NavigateBack:
             menu_navigation_stack.pop()
+
+        except NavigateTwoStepsBack:
+            del menu_navigation_stack[-2:]
 
         except PermissionError:
             show_message(errors["permission"])

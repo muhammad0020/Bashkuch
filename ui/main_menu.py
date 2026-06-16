@@ -8,7 +8,7 @@ to the appropriate application workflows.
 from .base_menu import BaseMenu
 from .creator_menu import AccountCreatorMenu
 from .generator_menu import PasswordGeneratorMenu
-
+from .managment_menu import AccountManagerMenu, AccountState
 
 class MainMenu(BaseMenu):
     """Represents the application's primary navigation menu."""
@@ -45,11 +45,11 @@ class MainMenu(BaseMenu):
             if choice == 1:
                 return AccountCreatorMenu(self.manager)
             elif choice == 2:
-                self.show_message("This feature is temporarily unavailable.")
+                return AccountManagerMenu(self.manager, AccountState.ACTIVE_ACCOUNTS)
             elif choice == 3:
                 return PasswordGeneratorMenu()
             elif choice == 4:
-                self.show_message("This feature is temporarily unavailable.")
+                return AccountManagerMenu(self.manager, AccountState.DELETED_ACCOUNTS)
             else:
                 exit_decision = self.capture_menu_selection(self.options["exit"],
                                                             self.prompts["exit"],

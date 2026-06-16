@@ -20,7 +20,29 @@ class AccountManager:
         self.deleted_accounts = deleted_accounts
         self.unique_keys = unique_keys
 
-    def check_key(self, key: tuple) -> bool:
+    def add_key(self, account_key: tuple[str, str]):
+        """
+        Adds an account key to the unique keys set.
+
+        The key is used to track existing accounts and prevent
+        duplicate service name and username combinations.
+
+        Parameters:
+            - key: A tuple in the format (service_name, username).
+        """
+        self.unique_keys.add(account_key)
+
+    def remove_key(self, account_key: tuple[str, str]):
+        """
+        Removes an account key from the unique keys set.
+
+        Parameters:
+            account_key: A tuple in the format
+                (service_name, username).
+        """
+        self.unique_keys.discard(account_key)
+
+    def check_key(self, key: tuple[str, str]) -> bool:
         """
         Check if a unique key already exists in the registered keys collection.
 
@@ -109,3 +131,59 @@ class AccountManager:
             account[key] = new_data
         save_data(self.active_accounts, self.deleted_accounts)
 
+    def search_accounts(self, service_name: str) -> list:
+        """
+        Search stored accounts by service name.
+
+        Parameters:
+            - service_name:
+                Name of the service to search for.
+
+        Returns:
+            - List of matching account dictionaries.
+              Returns an empty list if no matching accounts are found.
+        """
+        return [account for account in self.active_accounts if account["service_name"] == service_name]
+
+    def transfer_account(self, account: dict, source: list[dict], destination: list[dict]):
+        """
+        Transfers an account from one account list to another.
+
+        The account is added to the destination list, removed from
+        the source list, and the updated data is saved.
+
+        Parameters:
+            - account: The account dictionary to transfer.
+            - source: The list currently containing the account.
+            - destination: The list that will receive the account.
+        """
+        destination.append(account)
+        source.remove(account)
+        save_data(self.active_accounts, self.deleted_accounts)
+
+    def permanent_delete(self, account: dict, source: list[dict]):
+        """
+        Permanently removes an account from the specified list.
+
+        The account is deleted from the source list and the updated
+        data is saved to storage.
+
+        Parameters:
+            - account: The account dictionary to delete.
+            - source: The list containing the account to be removed.
+        """
+        source.remove(account)
+        save_data(self.active_accounts, self.deleted_accounts)
+
+    def permanent_delete_all(self, source: list[dict]):
+        """
+        Permanently removes all accounts from the specified list.
+
+        The source list is cleared and the updated data is saved
+        to storage.
+
+        Parameters:
+            - source: The account list to clear.
+        """
+        source.clear()
+        save_data(self.active_accounts, self.deleted_accounts)
